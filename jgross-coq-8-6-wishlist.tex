@@ -1,0 +1,54 @@
+\usepackage{beamer}
+
+\begin{document}
+\begin{frame}
+The following features, which I want, are slated for Coq 8.5:
+universe polymorphism
+parallel processing
+tactics in terms
+faster sigma types and projections
+eta for records
+
+The following are features that I want:
+a better story for namespacing (https://coq.inria.fr/bugs/show_bug.cgi?id=3171)
+irrelevant fields/a type of strict hProps/Coq*
+built-in CoqMT
+judgmental eta for the unit type
+a search that searches the entire standard library, and not just currently [Require]d files
+a search which is up to unification, rather than up to pattern matching
+coercions which don't care about the uniform inheritance condition (see also https://coq.inria.fr/bugs/show_bug.cgi?id=3115)
+built-in MTac or other monadic tactic language
+better handling of open terms in ltac, and support for recursing under binders in tactics (maybe fixed with new tactic engine? see also https://coq.inria.fr/bugs/show_bug.cgi?id=3106 and https://coq.inria.fr/bugs/show_bug.cgi?id=3102)
+easier use of ML plugins (I don't want to have to recompile them myself)
+induction-recursion
+more uniform support for canonical structures (like I've heard ssr has)
+support for computational parametricity
+better coinduction (should be compositional, maybe based on copatterns or something)
+size/type-based termination
+faster rewrite
+support for reflective simplification (maybe a native reifier which runs at type inference time, and a special type in the stdlib or something for syntax)
+automatic generation of the equivalence between record types and nested sigma types
+ability to write theorems that apply to all records, which are specialized at type-inference time (a la typeclasses or mtac)
+rewrite that alternates simpl and argument inference
+rewrite which matches the head by pattern matching and the rest by unification
+variant of @? patterns for [pattern]ing on things other than bound indices and parameters, heuristically (https://coq.inria.fr/bugs/show_bug.cgi?id=3148)
+a variant of [Hint Rewrite] which infers arguments based on pattern matching then runs [simpl] on the hypothesis, then rewrites with the simplified hypothesis
+'where' clauses in records should permit abbreviations (https://coq.inria.fr/bugs/show_bug.cgi?id=3066)
+variant of [abstract] which finishes the subproof with [Defined] rather than [Qed] (and another variant which finishes it with [Defined] and then runs [Global Opaque] on the constant)
+allow overriding symmetry, reflexivity (https://coq.inria.fr/bugs/show_bug.cgi?id=3113)
+etransitivity should take an optional term with holes (https://coq.inria.fr/bugs/show_bug.cgi?id=3065)
+where clauses in records should support (only parsing) (https://coq.inria.fr/bugs/show_bug.cgi?id=3067)
+support for simultaneous generation of terms binding scopes (https://coq.inria.fr/bugs/show_bug.cgi?id=3123)
+have a [function_scope] like [type_scope] (https://coq.inria.fr/bugs/show_bug.cgi?id=3080)
+judgmental eta for all inductive types (https://coq.inria.fr/bugs/show_bug.cgi?id=3119)
+more judgmental commutation rules for [match] (see https://coq.inria.fr/bugs/show_bug.cgi?id=3191 and related bugs)
+support for computational higher inductive types
+support for computational univalence
+computational functional extensionality
+better handling (speed-wise) of large terms and types (native projections might fix this)
+support for explicit universe level variables (without loosing the default of typical ambiguity)
+eq_sym (eq_sym p) should be judgmentally equal to p
+
+
+\end{frame}
+\end{document}
