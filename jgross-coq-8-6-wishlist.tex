@@ -1,6 +1,125 @@
-\usepackage{beamer}
+\documentclass{beamer}
+
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{latexsym}
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{2218}{\ensuremath{\circ}}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\to}}
+\DeclareUnicodeCharacter{2200}{\ensuremath{\forall}}
+\DeclareUnicodeCharacter{1D52}{\ensuremath{{}^{\text{o}}}}
+\DeclareUnicodeCharacter{1D56}{\ensuremath{{}^{\text{p}}}}
+\DeclareUnicodeCharacter{03C6}{\ensuremath{\varphi}}
+\DeclareUnicodeCharacter{03C8}{\ensuremath{\psi}}
+\DeclareUnicodeCharacter{03B1}{\ensuremath{\alpha}}
+\DeclareUnicodeCharacter{03B2}{\ensuremath{\beta}}
+\DeclareUnicodeCharacter{03B3}{\ensuremath{\gamma}}
+\DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\DeclareUnicodeCharacter{0280}{\ensuremath{{}_0}}
+\DeclareUnicodeCharacter{0281}{\ensuremath{{}_1}}
+\DeclareUnicodeCharacter{0282}{\ensuremath{{}_2}}
+\DeclareUnicodeCharacter{1D30}{\ensuremath{{}^D}}
+\DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
+
+\usetheme{Copenhagen}
+\usecolortheme{albatross}
+
+\title{Jason Gross' Wishlist for Coq}
+\date{POPL 2014 --- Coq Users Meeting}
+
+\setlength{\parskip}{\baselineskip}
 
 \begin{document}
+\begin{frame}
+\maketitle
+\end{frame}
+
+\begin{frame}
+\tableofcontents
+\end{frame}
+
+\section{Higher Inductive Types}
+
+\begin{frame}[fragile]{Higher Inductive Types}
+  \Large
+  Higher inductive types are: \pause
+  \begin{itemize}
+    \item Inductive types \pause
+    \item freely generated with higher path structure (non-trivial equalities) \pause
+  \end{itemize}
+  
+  Example: The interval ($0 \leadsto 1$) \pause
+\begin{verbatim}
+Inductive Interval :=
+| zero : Interval
+| one  : Interval
+| seg  : zero = one. 
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types}{Why?}
+  \Large
+  Higher inductive types are useful for: \pause
+  \begin{itemize}
+    \item Homotopy type theory (making basic spaces)\pause
+    \item Quotient types \pause
+    \item Formalizing version control systems (according to Dan Licata\only<4->{\footnote{``Git as a HIT'', \url{http://dlicata.web.wesleyan.edu/pubs/l13git/git.pdf}}})
+    \item Proving functional extensionality
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types}{Proving functional extensionality}
+  \Large
+\begin{verbatim}
+Definition functional_extensionality A B f g
+    (H : ∀ x, f x = g x ) → f = g
+   := f_equal
+       (λ i x ⇒
+         match i return B with
+           | zero ⇒ f x
+           | one  ⇒ g x
+           | seg  ⇒ H x
+         end)
+       seg.
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types}{Proving functional extensionality}
+  \Large
+\begin{verbatim}
+   := match seg in (_ = y)
+        return ((λ x ⇒ f x)
+                = (λ x ⇒ match y with
+                           | zero ⇒ f x
+                           | one  ⇒ g x
+                           | seg  ⇒ H x
+                         end))
+      with
+        | eq_refl => eq_refl
+      end.
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types}{How?}
+  \Large
+  Note that higher inductive types don't magically give you computational functional extensionality. \pause
+  
+  You must solve computational functional extensionality to implement computational higher inductive types.
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types}{Current Work}
+  \Large
+  \begin{itemize}
+    \item Yves Bertot's private inductive types;\footnote{\url{http://coq.inria.fr/files/coq5\_submission_3.pdf}} adapted by Matthieu Sozeau
+      \begin{itemize}
+        \item Easy to implement
+      \end{itemize}
+  \end{itemize}Note that higher inductive types don't magically give you computational functional extensionality. \pause
+  
+  You must solve computational functional extensionality to implement computational higher inductive types.
+\end{frame}
+
 \begin{frame}
 The following features, which I want, are slated for Coq 8.5:
 universe polymorphism
@@ -10,15 +129,15 @@ faster sigma types and projections
 eta for records
 
 The following are features that I want:
-a better story for namespacing (https://coq.inria.fr/bugs/show_bug.cgi?id=3171)
+a better story for namespacing (https://coq.inria.fr/bugs/show\_bug.cgi?id=3171)
 irrelevant fields/a type of strict hProps/Coq*
 built-in CoqMT
 judgmental eta for the unit type
 a search that searches the entire standard library, and not just currently [Require]d files
 a search which is up to unification, rather than up to pattern matching
-coercions which don't care about the uniform inheritance condition (see also https://coq.inria.fr/bugs/show_bug.cgi?id=3115)
+coercions which don't care about the uniform inheritance condition (see also https://coq.inria.fr/bugs/show\_bug.cgi?id=3115)
 built-in MTac or other monadic tactic language
-better handling of open terms in ltac, and support for recursing under binders in tactics (maybe fixed with new tactic engine? see also https://coq.inria.fr/bugs/show_bug.cgi?id=3106 and https://coq.inria.fr/bugs/show_bug.cgi?id=3102)
+better handling of open terms in ltac, and support for recursing under binders in tactics (maybe fixed with new tactic engine? see also https://coq.inria.fr/bugs/show\_bug.cgi?id=3106 and https://coq.inria.fr/bugs/show\_bug.cgi?id=3102)
 easier use of ML plugins (I don't want to have to recompile them myself)
 induction-recursion
 more uniform support for canonical structures (like I've heard ssr has)
@@ -31,23 +150,23 @@ automatic generation of the equivalence between record types and nested sigma ty
 ability to write theorems that apply to all records, which are specialized at type-inference time (a la typeclasses or mtac)
 rewrite that alternates simpl and argument inference
 rewrite which matches the head by pattern matching and the rest by unification
-variant of @? patterns for [pattern]ing on things other than bound indices and parameters, heuristically (https://coq.inria.fr/bugs/show_bug.cgi?id=3148)
+variant of @? patterns for [pattern]ing on things other than bound indices and parameters, heuristically (https://coq.inria.fr/bugs/show\_bug.cgi?id=3148)
 a variant of [Hint Rewrite] which infers arguments based on pattern matching then runs [simpl] on the hypothesis, then rewrites with the simplified hypothesis
-'where' clauses in records should permit abbreviations (https://coq.inria.fr/bugs/show_bug.cgi?id=3066)
+'where' clauses in records should permit abbreviations (https://coq.inria.fr/bugs/show\_bug.cgi?id=3066)
 variant of [abstract] which finishes the subproof with [Defined] rather than [Qed] (and another variant which finishes it with [Defined] and then runs [Global Opaque] on the constant)
-allow overriding symmetry, reflexivity (https://coq.inria.fr/bugs/show_bug.cgi?id=3113)
-etransitivity should take an optional term with holes (https://coq.inria.fr/bugs/show_bug.cgi?id=3065)
-where clauses in records should support (only parsing) (https://coq.inria.fr/bugs/show_bug.cgi?id=3067)
-support for simultaneous generation of terms binding scopes (https://coq.inria.fr/bugs/show_bug.cgi?id=3123)
-have a [function_scope] like [type_scope] (https://coq.inria.fr/bugs/show_bug.cgi?id=3080)
-judgmental eta for all inductive types (https://coq.inria.fr/bugs/show_bug.cgi?id=3119)
-more judgmental commutation rules for [match] (see https://coq.inria.fr/bugs/show_bug.cgi?id=3191 and related bugs)
+allow overriding symmetry, reflexivity (https://coq.inria.fr/bugs/show\_bug.cgi?id=3113)
+etransitivity should take an optional term with holes (https://coq.inria.fr/bugs/show\_bug.cgi?id=3065)
+where clauses in records should support (only parsing) (https://coq.inria.fr/bugs/show\_bug.cgi?id=3067)
+support for simultaneous generation of terms binding scopes (https://coq.inria.fr/bugs/show\_bug.cgi?id=3123)
+have a [function\_scope] like [type\_scope] (https://coq.inria.fr/bugs/show\_bug.cgi?id=3080)
+judgmental eta for all inductive types (https://coq.inria.fr/bugs/show\_bug.cgi?id=3119)
+more judgmental commutation rules for [match] (see https://coq.inria.fr/bugs/show\_bug.cgi?id=3191 and related bugs)
 support for computational higher inductive types
 support for computational univalence
 computational functional extensionality
 better handling (speed-wise) of large terms and types (native projections might fix this)
 support for explicit universe level variables (without loosing the default of typical ambiguity)
-eq_sym (eq_sym p) should be judgmentally equal to p
+eq\_sym (eq\_sym p) should be judgmentally equal to p
 
 
 \end{frame}
