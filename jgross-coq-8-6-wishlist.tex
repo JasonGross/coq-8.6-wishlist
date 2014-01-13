@@ -158,54 +158,108 @@ and picking
 \end{verbatim}
 \end{frame}
 
-\begin{frame}
-The following features, which I want, are slated for Coq 8.5:
-universe polymorphism
-parallel processing
-tactics in terms
-faster sigma types and projections
-eta for records
+\begin{frame}{The Rest of my Wishlist (I)}
+This was just a small (but important) part of my wishlist.  The rest is:
 
-The following are features that I want:
-a better story for namespacing (https://coq.inria.fr/bugs/show\_bug.cgi?id=3171)
-irrelevant fields/a type of strict hProps/Coq*
-built-in CoqMT
-judgmental eta for the unit type
-a search that searches the entire standard library, and not just currently [Require]d files
-a search which is up to unification, rather than up to pattern matching
-coercions which don't care about the uniform inheritance condition (see also https://coq.inria.fr/bugs/show\_bug.cgi?id=3115)
-built-in MTac or other monadic tactic language
-better handling of open terms in ltac, and support for recursing under binders in tactics (maybe fixed with new tactic engine? see also https://coq.inria.fr/bugs/show\_bug.cgi?id=3106 and https://coq.inria.fr/bugs/show\_bug.cgi?id=3102)
-easier use of ML plugins (I don't want to have to recompile them myself)
-induction-recursion
-more uniform support for canonical structures (like I've heard ssr has)
-support for computational parametricity
-better coinduction (should be compositional, maybe based on copatterns or something)
-size/type-based termination
-faster rewrite
-support for reflective simplification (maybe a native reifier which runs at type inference time, and a special type in the stdlib or something for syntax)
-automatic generation of the equivalence between record types and nested sigma types
-ability to write theorems that apply to all records, which are specialized at type-inference time (a la typeclasses or mtac)
-rewrite that alternates simpl and argument inference
-rewrite which matches the head by pattern matching and the rest by unification
-variant of @? patterns for [pattern]ing on things other than bound indices and parameters, heuristically (https://coq.inria.fr/bugs/show\_bug.cgi?id=3148)
-a variant of [Hint Rewrite] which infers arguments based on pattern matching then runs [simpl] on the hypothesis, then rewrites with the simplified hypothesis
-'where' clauses in records should permit abbreviations (https://coq.inria.fr/bugs/show\_bug.cgi?id=3066)
-variant of [abstract] which finishes the subproof with [Defined] rather than [Qed] (and another variant which finishes it with [Defined] and then runs [Global Opaque] on the constant)
-allow overriding symmetry, reflexivity (https://coq.inria.fr/bugs/show\_bug.cgi?id=3113)
-etransitivity should take an optional term with holes (https://coq.inria.fr/bugs/show\_bug.cgi?id=3065)
-where clauses in records should support (only parsing) (https://coq.inria.fr/bugs/show\_bug.cgi?id=3067)
-support for simultaneous generation of terms binding scopes (https://coq.inria.fr/bugs/show\_bug.cgi?id=3123)
-have a [function\_scope] like [type\_scope] (https://coq.inria.fr/bugs/show\_bug.cgi?id=3080)
-judgmental eta for all inductive types (https://coq.inria.fr/bugs/show\_bug.cgi?id=3119)
-more judgmental commutation rules for [match] (see https://coq.inria.fr/bugs/show\_bug.cgi?id=3191 and related bugs)
-support for computational higher inductive types
-support for computational univalence
-computational functional extensionality
-better handling (speed-wise) of large terms and types (native projections might fix this)
-support for explicit universe level variables (without loosing the default of typical ambiguity)
-eq\_sym (eq\_sym p) should be judgmentally equal to p
+\begin{itemize}
+  \item
+    a better story for namespacing\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3171}}
+  \item
+    irrelevant fields/a type of strict hProps/Coq*
+  \item 
+    built-in CoqMT
+  \item 
+    judgmental eta for the unit type
+  \item 
+    a search that searches the entire standard library, and not just currently \texttt{Require}d files
+  \item 
+    a search which is up to unification, rather than up to pattern matching
+\end{itemize}
+\end{frame}
 
-setoid rewriting in Type
+\begin{frame}{The Rest of my Wishlist (II)}
+\begin{itemize}
+  \item 
+    coercions which don't care about the uniform inheritance condition\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3115}}
+  \item 
+    built-in MTac or other monadic tactic language
+  \item 
+    better handling of open terms in Ltac, and support for recursing under binders in tactics (maybe fixed with new tactic engine?)\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3106} and \url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3102}}
+  \item 
+    easier use of ML plugins (I don't want to have to recompile them myself)
+  \item 
+    induction-recursion
+  \item 
+    more uniform support for canonical structures (like I've heard ssr has)
+  \item 
+    support for computational parametricity
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Rest of my Wishlist (II)}
+\begin{itemize}
+  \item 
+    better coinduction (should be compositional, maybe based on copatterns or something)
+  \item 
+    size/type-based termination
+  \item 
+    faster rewrite
+  \item 
+    support for reflective simplification (maybe a native reifier which runs at type inference time, and a special type in the stdlib or something for syntax)
+  \item 
+    automatic generation of the equivalence between record types and nested sigma types
+  \item 
+    ability to write theorems that apply to all records, which are specialized at type-inference time (a la typeclasses or mtac)
+  \item 
+    rewrite that alternates simpl and argument inference
+  \item 
+    rewrite which matches the head by pattern matching and the rest by unification
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Rest of my Wishlist (III)}
+\begin{itemize}
+  \item 
+    variant of @? patterns for [pattern]ing on things other than bound indices and parameters, heuristically\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3148}}
+  \item 
+    a variant of \texttt{Hint Rewrite} which infers arguments based on pattern matching then runs \texttt{simpl} on the hypothesis, then rewrites with the simplified hypothesis
+  \item 
+    'where' clauses in records should permit abbreviations\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3066}}
+  \item 
+    variant of \texttt{abstract} which finishes the subproof with \texttt{Defined} rather than \texttt{Qed} (and another variant which finishes it with \texttt{Defined} and then runs \texttt{Global Opaque} on the constant)
+  \item 
+    allow overriding symmetry, reflexivity\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3113}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Rest of my Wishlist (IV)}
+\begin{itemize}
+  \item 
+    etransitivity should take an optional term with holes\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3065}}
+  \item 
+    where clauses in records should support \texttt{(only parsing)}\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3067}}
+  \item 
+    support for simultaneous generation of terms binding scopes\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3123}}
+  \item 
+    have a \texttt{function\_scope} like \texttt{type\_scope}\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3080}}
+  \item 
+    judgmental eta for all inductive types\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3119}}
+  \item 
+    more judgmental commutation rules for \texttt{match}\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3191} and related bugs}
+  \item 
+    support for computational higher inductive types
+  \item 
+    support for computational univalence
+  \item 
+    computational functional extensionality
+  \item 
+    better handling (speed-wise) of large terms and types (native projections might fix this)
+  \item 
+    support for explicit universe level variables (without loosing the default of typical ambiguity)
+  \item 
+    \texttt{eq\_sym (eq\_sym p)} should be judgmentally equal to \texttt{p}
+  \item 
+    setoid rewriting in \texttt{Type}
+\end{itemize}
 \end{frame}
 \end{document}
