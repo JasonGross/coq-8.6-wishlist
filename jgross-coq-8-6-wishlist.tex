@@ -21,6 +21,7 @@
 \DeclareUnicodeCharacter{0282}{\ensuremath{{}_2}}
 \DeclareUnicodeCharacter{1D30}{\ensuremath{{}^D}}
 \DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
+\DeclareUnicodeCharacter{2115}{\ensuremath{\mathbb{N}}}
 
 \usetheme{Copenhagen}
 \usecolortheme{albatross}
@@ -101,23 +102,60 @@ Definition functional_extensionality A B f g
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile]{Higher Inductive Types}{How?}
+\begin{frame}{Higher Inductive Types}{How?}
   \Large
   Note that higher inductive types don't magically give you computational functional extensionality. \pause
   
-  You must solve computational functional extensionality to implement computational higher inductive types.
+  You must solve computational functional extensionality to implement computational HITs. \pause
+  
+  (Similar story for implementing computational univalence, another feature on my wishlist.) \pause
+  
+  Breaks canonicity, \pause preserves canonicity up to propositional equality? (conjectured by Voevodsky for UA)
 \end{frame}
 
-\begin{frame}[fragile]{Higher Inductive Types}{Current Work}
+\begin{frame}{Higher Inductive Types}{Current Work}
   \Large
   \begin{itemize}
-    \item Yves Bertot's private inductive types;\footnote{\url{http://coq.inria.fr/files/coq5\_submission_3.pdf}} adapted by Matthieu Sozeau
-      \begin{itemize}
-        \item Easy to implement
+    \item Yves Bertot's private inductive types;\footnote{\url{http://coq.inria.fr/files/coq5\_submission_3.pdf}} adapted by Matthieu Sozeau \pause
+      \begin{itemize} \large
+        \item Comparatively easy to implement \pause
+        \item Allows one to disable pattern matching on inductive types outside a module, which is sufficient to implement a trick by Dan Licata\footnote<3->{\url{http://homotopytypetheory.org/2011/04/23/running-circles-around-in-your-proof-assistant/}} \pause
+        \item Equalities are axioms; not computational \pause
+        \item Only eliminators, no pattern matching \pause
       \end{itemize}
-  \end{itemize}Note that higher inductive types don't magically give you computational functional extensionality. \pause
-  
-  You must solve computational functional extensionality to implement computational higher inductive types.
+    \item Burno Barras has some work that's more computational\footnote<6->{\url{https://github.com/barras/coq/tree/hit}}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Higher Inductive Types}{My Wishes}
+  \Large
+  I want: \pause
+  \begin{itemize}
+	\item to be able to define and pattern match on higher inductive types \pause
+	\item all tactics should support HITs \pause
+	\item judgmental reduction rules for matching on paths from HITs \pause
+	\item equality should not be special \pause
+	  \begin{itemize} \large
+	    \item typechecker should not depend on standard library \pause
+	    \item c.f. proposal for pattern matching justifying K\only<7->{\footnote{``The K axiom in Coq (almost) for free'' \url{http://coq.inria.fr/files/adt-2fev10-corbineau.pdf}}}
+	  \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types (without equality)}{Possible Generalization}
+  \Large
+\begin{verbatim}
+Inductive _==_ {A} (x : A) : ∀ {B}, B → Type :=
+| refl1 : x == x
+| refl2 : x == x.
+Inductive foo : Type :=
+| bar : nat → foo
+| proof1 : ∀ (n : ℕ), bar 2 == bar (S (S n))
+| proof2 : ∀ (n : ℕ), bar 0 == bar 1
+and picking
+| proof1 : ∀ n, bar 2 == _ := λ n ⇒ refl1
+| proof2 : ∀ n, bar 0 == _ := λ n ⇒ refl2.
+\end{verbatim}
 \end{frame}
 
 \begin{frame}
@@ -168,6 +206,6 @@ better handling (speed-wise) of large terms and types (native projections might 
 support for explicit universe level variables (without loosing the default of typical ambiguity)
 eq\_sym (eq\_sym p) should be judgmentally equal to p
 
-
+setoid rewriting in Type
 \end{frame}
 \end{document}
