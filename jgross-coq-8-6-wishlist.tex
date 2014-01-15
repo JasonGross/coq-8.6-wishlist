@@ -22,6 +22,11 @@
 \DeclareUnicodeCharacter{1D30}{\ensuremath{{}^D}}
 \DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
 \DeclareUnicodeCharacter{2115}{\ensuremath{\mathbb{N}}}
+\DeclareUnicodeCharacter{2261}{\ensuremath{\equiv}}
+
+% http://www-ljk.imag.fr/membres/Jerome.Lelong/latex/appendixnumberbeamer.sty
+% Reference: http://tex.stackexchange.com/questions/2541/beamer-frame-numbering-in-appendix
+\usepackage{appendixnumberbeamer}
 
 \usetheme{Copenhagen}
 \usecolortheme{albatross}
@@ -29,7 +34,7 @@
 \title{Jason Gross' Wishlist for Coq}
 \date{POPL 2014 --- Coq Users Meeting}
 
-\setlength{\parskip}{\baselineskip}
+\setlength{\parskip}{0.5\baselineskip}
 
 \begin{document}
 \begin{frame}
@@ -40,7 +45,282 @@
 \tableofcontents
 \end{frame}
 
+
+\section{More Powerful Judgmental Equality}
+
+\begin{frame}{Judgmental Equality}
+  \Large
+  \begin{center}
+    More Powerful Judgmental Equality
+  \end{center} \pause
+  
+  Warning: Some of my proposals get rather insane, so the further on in this section they are, the more grains of salt you should be taking them with.
+\end{frame}
+
+\begin{frame}{Judgmental Equality}{My Wishes: \texorpdfstring{$\eta$}{η} for records}
+  \Large
+  \begin{center}
+    $\eta$ for records
+  \end{center}
+  
+  Implemented by Matthieu Sozeau; in 8.5, I can now have $(\mathcal C^{\text{op}})^\text{op} \equiv \mathcal C$ for categories $\mathcal C$! \pause
+  
+  It would still be nice to have
+  \begin{center}
+  \texttt{$\forall$ x y :\ unit, x $\equiv$ tt $\equiv$ y}.
+  \end{center}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: \texorpdfstring{$\eta$}{η} for inductives}
+  \Large
+  \begin{center}
+    $\eta$ for inductive types
+  \end{center}
+  I want
+\begin{verbatim}
+∀ A B (x : A + B),
+  match x with
+    | inl x' ⇒ inl x'
+    | inr x' ⇒ inr x'
+  end ≡ x
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: \texorpdfstring{$\eta$}{η} for inductives}
+  \Large
+  \begin{center}
+    $\eta$ for inductive types
+  \end{center}
+  I want
+\begin{verbatim}
+∀ A (x y : A) (p : x = y),
+  match p in (_ = y') return (x = y') with
+    | eq_refl ⇒ eq_refl
+  end ≡ p
+
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want a \texttt{match} to eat up unused arguments:
+\begin{verbatim}
+  match p as p' in (T x _)
+    return (T' x p' → T'' x p')
+  with
+    | con1 ⇒ (λ _ ⇒ val1)
+    ...
+  end y
+  ≡
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want a \texttt{match} to eat up unused arguments:
+\begin{verbatim}
+  ≡
+  match p as p' in (T x _)
+    return (T'' x p')
+  with
+    | con1 ⇒ val1
+    ...
+  end
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es to distribute over arrows
+\begin{verbatim}
+  match p as p' in (T x _)
+    return (∀ y : T', T'' x p' y)
+  with
+    | con1 ⇒ f1
+    ...
+  end
+  ≡
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es to distribute over arrows
+\begin{verbatim}
+  ≡
+  (λ y : T' ⇒ 
+      match p as p' in (T x _)
+        return (T'' x p' y)
+      with
+        | con1 ⇒ f1 y
+        ...
+      end)
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want a \texttt{match} whose branches unify to disappear (if the return type is constant)
+\begin{verbatim}
+  match p return T with
+    | _ ⇒ val
+  end ≡ val
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es to distribute over inductive types (when the branches unify appropriately)
+\begin{verbatim}
+  match p as p' in (T x _)
+    return (T' (f x p'))
+  with
+    | con1 ⇒ Build_T' _ con1 val1
+    ...
+  end
+  ≡
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es to distribute over inductive types (when the branches unify appropriately)
+\begin{verbatim}
+  ≡
+  Build_T'
+    (match p with | con1 ⇒ f _ con1 | ... end)
+    (match p with | con1 ⇒ con1 | ... end)
+    (match p with | con1 ⇒ val1 | ... end)
+    
+    
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es on \texttt{match}es to reduce to \texttt{match}es which return \texttt{match}es
+\begin{verbatim}
+  match (match ... with ... end) with ... ⇒ ... end
+  ≡
+  match ... with ... ⇒ ... (match ... with ... end) end
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Judgmental Groupoid Laws}
+  \Large
+  \begin{center}
+    Judgmental Groupoid Laws
+  \end{center}
+  I want (the option of) \texttt{Type}s to be strict $\infty$-groupoids
+  
+  \begin{align*}
+    (p^{-1})^{-1} & \equiv p & \text{($p^{-1}$ is \texttt{eq\_sym} $p$)} \\
+    p \circ (q \circ r) & \equiv (p \circ q) \circ r\quad & \text{($p \circ q$ is \texttt{eq\_trans} $p$ $q$)} \\
+    p \circ 1 & \equiv p \equiv 1 \circ p & \text{(1 is \texttt{eq\_refl})}
+  \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Axiom K-based Pattern Matching When It's Provable}
+  \Large
+  \begin{center}
+    K-Based Pattern Matching
+  \end{center}
+  I want K-based pattern matching on types which Coq can infer are hSets (satisfy uniqueness of identity proofs, and therefore K), any maybe for types where I can prove K. \pause  Alternatively, maybe a ``strict 0-truncation'' operator, and support for K there. \pause
+  
+  Proposal by Pierre Corbineau: ``The K axiom in Coq (almost) for free''\footnote<2->{\url{http://coq.inria.fr/files/adt-2fev10-corbineau.pdf}}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Irrelevant Types}
+  \Large
+  \begin{center}
+    Irrelevant Types
+  \end{center}
+  I want types with judgmental (proof) irrelevance, like dotted fields in Agda. \pause  These are strict hProps.  \pause
+  
+  Current work: Miquel's implicit calculus of constructions (ICC), B. Barras and B. Bernardo's decidable version (ICC*)
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Reflection When We Can Have It}
+  \Large
+  \begin{center}
+    Limited Equality Reflection
+  \end{center}
+  I want equality reflection whenever it doesn't break things
+\begin{verbatim}
+(∀ (x : T) (pf : x = x), pf = eq_refl)
+→ ∀ (x : T) (pf : x = x), pf ≡ eq_refl    
+\end{verbatim}
+\pause
+  (What's a general rule?  Inductive type families with one constructor which are all provably equal to that constructor?)
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Postulating Judgmental Equality}
+  \Large
+  \begin{center}
+    Postulating Judgmental Equality?
+  \end{center}
+  Voevodsky suggests (and Dan Grayson has worked on implementing) having two equality types, a non-fibrant reflected equality type, and a fibrant intensional equality type.  Perhaps Coq should go this route one day?
+\end{frame}
+
+\begin{frame}{Judgmental Equality}{My Wishes}
+  \Large
+  I also want:
+  \begin{itemize}
+    \item \texttt{($\lambda$ x y $\Longrightarrow$ x + y) $\equiv$ ($\lambda$ x y $\Longrightarrow$ y + x)} (done in CoqMT by Pierre-Yves Strub)
+    \item ability to add computation rules for axioms \pause
+      \begin{itemize} \large
+        \item univalence \pause
+        \item functional extensionality \pause
+        \item higher inductive types \pause
+        \item internalized parametricity
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Judgmental Equality}{Implementation Properties}
+  \Large
+  \begin{itemize}
+    \item should be optional extensions \pause
+    \item should be customizable, with plug-ins or flags or both \pause
+    \item type-checking should still be decidable
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Judgmental Equality}{My Wishes: Why?}
+  \Large
+  Why? \pause
+  
+  Theorem proving is easier when the type-checker does more work for me. \pause
+  
+  And it seems like an interesting system to play with.
+\end{frame}
+
 \section{Higher Inductive Types}
+\subsection{What are they?}
 
 \begin{frame}[fragile]{Higher Inductive Types}
   \Large
@@ -49,7 +329,6 @@
     \item Inductive types \pause
     \item freely generated with higher path structure (non-trivial equalities) \pause
   \end{itemize}
-  
   Example: The interval ($0 \leadsto 1$) \pause
 \begin{verbatim}
 Inductive Interval :=
@@ -59,13 +338,18 @@ Inductive Interval :=
 \end{verbatim}
 \end{frame}
 
+\subsection{How are they useful?}
+
 \begin{frame}[fragile]{Higher Inductive Types}{Why?}
   \Large
   Higher inductive types are useful for: \pause
   \begin{itemize}
     \item Homotopy type theory (making basic spaces)\pause
     \item Quotient types \pause
-    \item Formalizing version control systems (according to Dan Licata\only<4->{\footnote{``Git as a HIT'', \url{http://dlicata.web.wesleyan.edu/pubs/l13git/git.pdf}}})
+    \item Formalizing version control systems (according to Dan Licata%\only<4->{%
+    \footnote<4->{``Git as a HIT'', \url{http://dlicata.web.wesleyan.edu/pubs/l13git/git.pdf}}%
+    %}%
+    ) \pause
     \item Proving functional extensionality
   \end{itemize}
 \end{frame}
@@ -74,15 +358,15 @@ Inductive Interval :=
   \Large
 \begin{verbatim}
 Definition functional_extensionality A B f g
-    (H : ∀ x, f x = g x ) → f = g
-   := f_equal
-       (λ i x ⇒
-         match i return B with
-           | zero ⇒ f x
-           | one  ⇒ g x
-           | seg  ⇒ H x
-         end)
-       seg.
+     : (∀ x, f x = g x) → f = g
+   := λ H ⇒ f_equal
+             (λ i x ⇒
+               match i return B with
+                 | zero ⇒ f x
+                 | one  ⇒ g x
+                 | seg  ⇒ H x
+               end)
+             seg.
 \end{verbatim}
 \end{frame}
 
@@ -95,12 +379,14 @@ Definition functional_extensionality A B f g
                            | zero ⇒ f x
                            | one  ⇒ g x
                            | seg  ⇒ H x
-                         end))
+                          end))
       with
         | eq_refl => eq_refl
       end.
 \end{verbatim}
 \end{frame}
+
+\subsection{Implementation}
 
 \begin{frame}{Higher Inductive Types}{How?}
   \Large
@@ -110,7 +396,7 @@ Definition functional_extensionality A B f g
   
   (Similar story for implementing computational univalence, another feature on my wishlist.) \pause
   
-  Breaks canonicity, \pause preserves canonicity up to propositional equality? (conjectured by Voevodsky for UA)
+  Breaks canonicity \pause (jugdmentally), \pause preserves it up to propositional equality? {\normalsize (conjecture by Voevodsky for UA)}
 \end{frame}
 
 \begin{frame}{Higher Inductive Types}{Current Work}
@@ -123,7 +409,7 @@ Definition functional_extensionality A B f g
         \item Equalities are axioms; not computational \pause
         \item Only eliminators, no pattern matching \pause
       \end{itemize}
-    \item Burno Barras has some work that's more computational\footnote<6->{\url{https://github.com/barras/coq/tree/hit}}
+    \item Burno Barras has some partial work that's more computational\footnote<6->{\url{https://github.com/barras/coq/tree/hit}}
   \end{itemize}
 \end{frame}
 
@@ -137,15 +423,66 @@ Definition functional_extensionality A B f g
 	\item equality should not be special \pause
 	  \begin{itemize} \large
 	    \item typechecker should not depend on standard library \pause
-	    \item c.f. proposal for pattern matching justifying K\only<7->{\footnote{``The K axiom in Coq (almost) for free'' \url{http://coq.inria.fr/files/adt-2fev10-corbineau.pdf}}}
+	    \item c.f. proposal for pattern matching justifying K\footnote<7->{``The K axiom in Coq (almost) for free'' \url{http://coq.inria.fr/files/adt-2fev10-corbineau.pdf}}
 	  \end{itemize}
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Higher Inductive Types (without equality)}{Possible Generalization}
+\begin{frame}[fragile]{Higher Inductive Types (without equality in the kernel)}{Possible Generalization (I)}
+  \Large
+  \begin{itemize}
+    \item If equality isn't special, then HITs can put inhabitants in arbitrary types \pause
+    \item BAD, if it allows us to give a proof of \texttt{False}
+  \end{itemize}
+\begin{verbatim}
+
+
+
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types (without equality in the kernel)}{Possible Generalization (I)}
+  \Large
+  \begin{itemize}
+    \item If equality isn't special, then HITs can put inhabitants in arbitrary types
+    \item BAD, if it allows us to give a proof of \texttt{False}
+  \end{itemize}
+\begin{verbatim}
+Inductive BAD : Set :=
+| silly : BAD
+| terrible : False.
+\end{verbatim}
+\end{frame}
+
+\begin{frame}{Higher Inductive Types (without equality in the kernel)}{Possible Generalization (I)}
+  \Large
+  \begin{itemize}
+    \item If equality isn't special, then HITs can put inhabitants in arbitrary types
+    \item BAD, if it allows us to give a proof of \texttt{False}
+    \item Idea: Require providing an inhabitant of the appropriate type family \pause
+      \begin{itemize} \large
+        \item Used to pick out which branch of pattern matching to use \pause
+        \item Simply reduces when the provided term sits in the right type (not just right type family)
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types (without equality in the kernel)}{Possible Generalization (I)}
   \Large
 \begin{verbatim}
-Inductive _==_ {A} (x : A) : ∀ {B}, B → Type :=
+Inductive Interval : Type :=
+| zero : Interval
+| one : Interval
+| seg : zero = one
+and picking
+| seg : zero = _ := eq_refl.
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Higher Inductive Types (without equality in the kernel)}{Possible Generalization (II)}
+  \Large
+\begin{verbatim}
+Inductive _==_ `(x : A) : ∀ {B}, B → Type :=
 | refl1 : x == x
 | refl2 : x == x.
 Inductive foo : Type :=
@@ -158,69 +495,86 @@ and picking
 \end{verbatim}
 \end{frame}
 
+\begin{frame}{Higher Inductive Types (without equality in the kernel)}{Possible Generalization (III)}
+  \Large
+  Mike Shulman tells me this might be saying that a generalized higher inductive type is a polynomial functor $F$ together with an object of $F(1)$. \pause
+  
+  We still need computation rules for this.  \pause (See \autoref{sec:comp-hit}) \pause
+  
+  Also an implementation, and justification of consistency.
+\end{frame}
+
+
+
+
 \begin{frame}{The Rest of my Wishlist (I)}
-This was just a small (but important) part of my wishlist.  The rest is:
+This was just a small (but important) part of my wishlist.  The rest:
 
 \begin{itemize}
   \item
     a better story for namespacing\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3171}}
+  \item 
+    induction-recursion, induction-induction, etc.
   \item
-    irrelevant fields/a type of strict hProps/Coq*
+    very dependent types, insanely dependent types ($\Sigma$ as $\Pi$)\footnote{\url{https://github.com/UlfNorell/insane}, ``Formal Objects in Type Theory Using Very Dependent Types'' \url{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.39.4169&rep=rep1&type=pdf}}
   \item 
-    built-in CoqMT
+    better coinduction (should be compositional, maybe based on copatterns)
   \item 
-    judgmental eta for the unit type
+    size/type-based termination
+  \item 
+    support for explicit universe level variables (without loosing the default of typical ambiguity)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Rest of my Wishlist (II)}
+\begin{itemize}
+  \item
+    parallel version of \texttt{all: solve} when there are no evars in the goal
   \item 
     a search that searches the entire standard library, and not just currently \texttt{Require}d files
   \item 
     a search which is up to unification, rather than up to pattern matching
-\end{itemize}
-\end{frame}
-
-\begin{frame}{The Rest of my Wishlist (II)}
-\begin{itemize}
   \item 
-    coercions which don't care about the uniform inheritance condition\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3115}}
-  \item 
-    built-in MTac or other monadic tactic language
-  \item 
-    better handling of open terms in Ltac, and support for recursing under binders in tactics (maybe fixed with new tactic engine?)\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3106} and \url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3102}}
-  \item 
-    easier use of ML plugins (I don't want to have to recompile them myself)
-  \item 
-    induction-recursion
-  \item 
-    more uniform support for canonical structures (like I've heard ssr has)
-  \item 
-    support for computational parametricity
-\end{itemize}
-\end{frame}
-
-\begin{frame}{The Rest of my Wishlist (II)}
-\begin{itemize}
-  \item 
-    better coinduction (should be compositional, maybe based on copatterns or something)
-  \item 
-    size/type-based termination
+    coercions that don't care about the uniform inheritance condition\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3115}}
   \item 
     faster rewrite
-  \item 
-    support for reflective simplification (maybe a native reifier which runs at type inference time, and a special type in the stdlib or something for syntax)
   \item 
     automatic generation of the equivalence between record types and nested sigma types
   \item 
     ability to write theorems that apply to all records, which are specialized at type-inference time (a la typeclasses or mtac)
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Rest of my Wishlist (II)}
+\begin{itemize}
+  \item
+    notations should be able to pick a meaning based on the type of their constituents (but must have a consistent scope for each term across all meanings) (can currently be hacked with boilerplate, typeclasses, and \texttt{\$(...)\$} to remove the typeclasses)\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3090}}
   \item 
-    rewrite that alternates simpl and argument inference
+    better handling of open terms in Ltac, and support for recursing under binders in tactics (maybe fixed with new tactic engine?)\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3106} and \url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3102}}
   \item 
-    rewrite which matches the head by pattern matching and the rest by unification
+    easier use of ML plugins (I don't want to have to recompile them myself)
 \end{itemize}
 \end{frame}
 
 \begin{frame}{The Rest of my Wishlist (III)}
 \begin{itemize}
   \item 
+    more uniform support for canonical structures (like ssr has)
+  \item 
+    support for reflective simplification (maybe a native reifier which runs at type inference time, and a special type in the stdlib or something for syntax)
+  \item 
+    rewrite that alternates simpl and argument inference
+  \item 
+    rewrite which matches the head by pattern matching and the rest by unification
+  \item 
     variant of @? patterns for [pattern]ing on things other than bound indices and parameters, heuristically\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3148}}
+  \item 
+    have a \texttt{function\_scope} like \texttt{type\_scope}\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3080}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The Rest of my Wishlist (IV)}
+\begin{itemize}
   \item 
     a variant of \texttt{Hint Rewrite} which infers arguments based on pattern matching then runs \texttt{simpl} on the hypothesis, then rewrites with the simplified hypothesis
   \item 
@@ -232,7 +586,7 @@ This was just a small (but important) part of my wishlist.  The rest is:
 \end{itemize}
 \end{frame}
 
-\begin{frame}{The Rest of my Wishlist (IV)}
+\begin{frame}{The Rest of my Wishlist (V)}
 \begin{itemize}
   \item 
     etransitivity should take an optional term with holes\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3065}}
@@ -241,25 +595,54 @@ This was just a small (but important) part of my wishlist.  The rest is:
   \item 
     support for simultaneous generation of terms binding scopes\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3123}}
   \item 
-    have a \texttt{function\_scope} like \texttt{type\_scope}\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3080}}
-  \item 
-    judgmental eta for all inductive types\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3119}}
-  \item 
-    more judgmental commutation rules for \texttt{match}\footnote{\url{https://coq.inria.fr/bugs/show\_bug.cgi?id=3191} and related bugs}
-  \item 
-    support for computational higher inductive types
-  \item 
-    support for computational univalence
-  \item 
-    computational functional extensionality
-  \item 
     better handling (speed-wise) of large terms and types (native projections might fix this)
-  \item 
-    support for explicit universe level variables (without loosing the default of typical ambiguity)
-  \item 
-    \texttt{eq\_sym (eq\_sym p)} should be judgmentally equal to \texttt{p}
-  \item 
-    setoid rewriting in \texttt{Type}
 \end{itemize}
 \end{frame}
+
+\begin{frame}
+\Huge\begin{center}
+Thanks!
+
+Questions?
+\end{center}
+\end{frame}
+
+\appendix
+
+
+\section{Computation Rules for HITs} \label{sec:comp-hit}
+
+\begin{frame}[fragile]{Computation Rules for HITs}{Proposed computation rule for HITs}
+\Large
+Given a higher inductive type \verb|T| and a path constructor \verb|p : a = b|, we should have
+\begin{verbatim}
+match p in (_ = y)
+  return (P (fixmatch {h} y with 
+               | a => c
+               | b => d
+               | p => f
+             end)) with
+  | eq_refl => g
+end
+≡
+\end{verbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]{Computation Rules for HITs}{Proposed computation rule for HITs}
+\Large
+Given a higher inductive type \verb|T| and a path constructor \verb|p : a = b|, we should have
+\begin{verbatim}
+≡
+match f in (_ = y) return (P y) with
+  | eq_refl => g
+end
+
+
+
+
+
+\end{verbatim}
+\end{frame}
+
 \end{document}
