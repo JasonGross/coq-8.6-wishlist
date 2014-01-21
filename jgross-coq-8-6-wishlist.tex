@@ -1,5 +1,8 @@
 \documentclass{beamer}
 
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amstext}
 \usepackage{hyperref}
 \usepackage{amssymb}
 \usepackage{latexsym}
@@ -118,6 +121,7 @@
 \end{verbatim}
 \end{frame}
 
+
 \begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
   \Large
   \begin{center}
@@ -135,99 +139,12 @@
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+\begin{frame}{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
   \Large
   \begin{center}
     More computation rules for \texttt{match}
   \end{center}
-  I want \texttt{match}es to distribute over arrows
-\begin{verbatim}
-  match p as p' in (T x _)
-    return (∀ y : T', T'' x p' y)
-  with
-    | con1 ⇒ f1
-    ...
-  end
-  ≡
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
-  \Large
-  \begin{center}
-    More computation rules for \texttt{match}
-  \end{center}
-  I want \texttt{match}es to distribute over arrows
-\begin{verbatim}
-  ≡
-  (λ y : T' ⇒ 
-      match p as p' in (T x _)
-        return (T'' x p' y)
-      with
-        | con1 ⇒ f1 y
-        ...
-      end)
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
-  \Large
-  \begin{center}
-    More computation rules for \texttt{match}
-  \end{center}
-  I want a \texttt{match} whose branches unify to disappear (if the return type is constant)
-\begin{verbatim}
-  match p return T with
-    | _ ⇒ val
-  end ≡ val
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
-  \Large
-  \begin{center}
-    More computation rules for \texttt{match}
-  \end{center}
-  I want \texttt{match}es to distribute over inductive types (when the branches unify appropriately)
-\begin{verbatim}
-  match p as p' in (T x _)
-    return (T' (f x p'))
-  with
-    | con1 ⇒ Build_T' _ con1 val1
-    ...
-  end
-  ≡
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
-  \Large
-  \begin{center}
-    More computation rules for \texttt{match}
-  \end{center}
-  I want \texttt{match}es to distribute over inductive types (when the branches unify appropriately)
-\begin{verbatim}
-  ≡
-  Build_T'
-    (match p with | con1 ⇒ f _ con1 | ... end)
-    (match p with | con1 ⇒ con1 | ... end)
-    (match p with | con1 ⇒ val1 | ... end)
-    
-    
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
-  \Large
-  \begin{center}
-    More computation rules for \texttt{match}
-  \end{center}
-  I want \texttt{match}es on \texttt{match}es to reduce to \texttt{match}es which return \texttt{match}es
-\begin{verbatim}
-  match (match ... with ... end) with ... ⇒ ... end
-  ≡
-  match ... with ... ⇒ ... (match ... with ... end) end
-\end{verbatim}
+  And many more\ldots (see \hyperref[sec:more-match]{Appendix})
 \end{frame}
 
 \begin{frame}[fragile]{Judgmental Equality}{My Wishes: Judgmental Groupoid Laws}
@@ -251,7 +168,7 @@
   \end{center}
   I want K-based pattern matching on types which Coq can infer are hSets (satisfy uniqueness of identity proofs, and therefore K), any maybe for types where I can prove K. \pause  Alternatively, maybe a ``strict 0-truncation'' operator, and support for K there. \pause
   
-  Proposal by Pierre Corbineau: ``The K axiom in Coq (almost) for free''\footnote<2->{\url{http://coq.inria.fr/files/adt-2fev10-corbineau.pdf}}
+  Proposal by Pierre Corbineau: ``The K axiom in Coq (almost) for free''\footnote<3->{\url{http://coq.inria.fr/files/adt-2fev10-corbineau.pdf}}
 \end{frame}
 
 \begin{frame}[fragile]{Judgmental Equality}{My Wishes: Irrelevant Types}
@@ -499,7 +416,7 @@ and picking
   \Large
   Mike Shulman tells me this might be saying that a generalized higher inductive type is a polynomial functor $F$ together with an object of $F(1)$. \pause
   
-  We still need computation rules for this.  \pause (See \autoref{sec:comp-hit}) \pause
+  We still need computation rules for this.  \pause (See \hyperref[sec:comp-hit]{Appendix}) \pause
   
   Also an implementation, and justification of consistency.
 \end{frame}
@@ -529,7 +446,7 @@ This was just a small (but important) part of my wishlist.  The rest:
 \begin{frame}{The Rest of my Wishlist (II)}
 \begin{itemize}
   \item
-    parallel version of \texttt{all: solve} when there are no evars in the goal
+    parallel version of \texttt{all:} \texttt{solve} when there are no evars in the goal
   \item 
     a search that searches the entire standard library, and not just currently \texttt{Require}d files
   \item 
@@ -612,6 +529,104 @@ Questions?
 \appendix
 
 
+
+\section{More Stronger Judgmental Equality} \label{sec:more-match}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es to distribute over arrows
+\begin{verbatim}
+  match p as p' in (T x _)
+    return (∀ y : T', T'' x p' y)
+  with
+    | con1 ⇒ f1
+    ...
+  end
+  ≡
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es to distribute over arrows
+\begin{verbatim}
+  ≡ (λ y : T' ⇒ 
+        match p as p' in (T x _)
+          return (T'' x p' y)
+        with
+          | con1 ⇒ f1 y
+          ...
+        end)
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want a \texttt{match} whose branches unify to disappear (if the return type is constant)
+\begin{verbatim}
+  match p return T with
+    | _ ⇒ val
+  end ≡ val
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es to distribute over inductive types (when the branches unify appropriately)
+\begin{verbatim}
+  match p as p' in (T x _)
+    return (T' (f x p'))
+  with
+    | con1 ⇒ Build_T' _ con1 val1
+    ...
+  end
+  ≡
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es to distribute over inductive types (when the branches unify appropriately)
+\begin{verbatim}
+  ≡
+  Build_T'
+    (match p with | con1 ⇒ f _ con1 | ... end)
+    (match p with | con1 ⇒ con1 | ... end)
+    (match p with | con1 ⇒ val1 | ... end)
+    
+    
+\end{verbatim}
+\end{frame}
+
+
+\begin{frame}[fragile]{Judgmental Equality}{My Wishes: Computation Rules for \texorpdfstring{\texttt{match}}{match}}
+  \Large
+  \begin{center}
+    More computation rules for \texttt{match}
+  \end{center}
+  I want \texttt{match}es on \texttt{match}es to reduce to \texttt{match}es which return \texttt{match}es
+\begin{verbatim}
+  match (match ... with ... end) with ... ⇒ ... end
+  ≡
+  match ... with ... ⇒ ... (match ... with ... end) end
+\end{verbatim}
+\end{frame}
+
 \section{Computation Rules for HITs} \label{sec:comp-hit}
 
 \begin{frame}[fragile]{Computation Rules for HITs}{Proposed computation rule for HITs}
@@ -646,5 +661,6 @@ end
 
 \end{verbatim}
 \end{frame}
+
 
 \end{document}
